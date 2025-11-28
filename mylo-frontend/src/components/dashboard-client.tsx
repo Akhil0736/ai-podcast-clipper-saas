@@ -12,9 +12,10 @@ import {
   CardHeader,
   CardTitle,
 } from "./ui/card";
-import { Loader2, UploadCloud } from "lucide-react";
+import { Input } from "./ui/input";
+import { Loader2, UploadCloud, Youtube } from "lucide-react";
 import { useState } from "react";
-import { generateUploadSignature, markFileAsUploaded } from "~/actions/upload";
+import { generateUploadSignature, markFileAsUploaded, processYoutubeUrl } from "~/actions/upload";
 import { toast } from "sonner";
 import { processVideo } from "~/actions/generation";
 import {
@@ -28,6 +29,16 @@ import {
 import { Badge } from "./ui/badge";
 import { useRouter } from "next/navigation";
 import { ClipDisplay } from "./clip-display";
+
+// YouTube URL validation
+function isValidYoutubeUrl(url: string): boolean {
+  const patterns = [
+    /^(https?:\/\/)?(www\.)?youtube\.com\/watch\?v=[\w-]+/,
+    /^(https?:\/\/)?(www\.)?youtu\.be\/[\w-]+/,
+    /^(https?:\/\/)?(www\.)?youtube\.com\/shorts\/[\w-]+/,
+  ];
+  return patterns.some(pattern => pattern.test(url));
+}
 
 export function DashboardClient({
   uploadedFiles,
@@ -46,6 +57,9 @@ export function DashboardClient({
   const [files, setFiles] = useState<File[]>([]);
   const [uploading, setUploading] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
+  const [youtubeUrl, setYoutubeUrl] = useState("");
+  const [processingYoutube, setProcessingYoutube] = useState(false);
+  const [uploadMode, setUploadMode] = useState<"file" | "youtube">("file");
   const router = useRouter();
 
   const handleRefresh = async () => {
@@ -56,6 +70,42 @@ export function DashboardClient({
 
   const handleDrop = (acceptedFiles: File[]) => {
     setFiles(acceptedFiles);
+  };
+
+  const handleYoutubeSubmit = async () => {
+    if (!youtubeUrl.trim()) return;
+    
+    if (!isValidYoutubeUrl(youtubeUrl)) {
+      toast.error("Invalid YouTube URL", {
+        description: "Please enter a valid YouTube video URL",
+      });
+      return;
+    }
+
+    setProcessingYoutube(true);
+
+    try {
+      const result = await processYoutubeUrl(youtubeUrl);
+      
+      if (!result.success) {
+        throw new Error(result.error ?? "Failed to process YouTube video");
+      }
+
+      setYoutubeUrl("");
+      router.refresh();
+
+      toast.success("YouTube video submitted", {
+        description: "Your video is being downloaded and processed. Check the status below.",
+        duration: 5000,
+      });
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : "Failed to process YouTube video. Please try again.";
+      toast.error("Processing failed", {
+        description: errorMessage,
+      });
+    } finally {
+      setProcessingYoutube(false);
+    }
   };
 
   const handleUpload = async () => {
@@ -75,6 +125,7 @@ export function DashboardClient({
       if (!success) throw new Error("Failed to get upload signature");
 
       // Create form data for Cloudinary upload
+      // Note: resource_type is in the URL path, not form data
       const formData = new FormData();
       formData.append('file', file);
       formData.append('signature', signature);
@@ -82,7 +133,6 @@ export function DashboardClient({
       formData.append('api_key', apiKey);
       formData.append('folder', folder);
       formData.append('public_id', publicId);
-      formData.append('resource_type', 'video');
 
       // Upload to Cloudinary
       const uploadResponse = await fetch(
@@ -112,7 +162,7 @@ export function DashboardClient({
           "Your video has been scheduled for processing. Check the status below.",
         duration: 5000,
       });
-    } catch (error) {
+    } catch (_error) {
       toast.error("Upload failed", {
         description:
           "There was a problem uploading your video. Please try again.",
@@ -164,10 +214,41 @@ export function DashboardClient({
             <CardHeader>
               <CardTitle>Upload Video</CardTitle>
               <CardDescription>
-                Upload your video file to generate clips
+                Upload a video file or paste a YouTube URL to generate clips
               </CardDescription>
             </CardHeader>
             <CardContent>
+              {/* Upload Mode Tabs */}
+              <div className="mb-6">
+                <div className="flex gap-2 p-1 bg-gray-100 rounded-lg w-fit">
+                  <button
+                    onClick={() => setUploadMode("file")}
+                    className={`flex items-center gap-2 px-4 py-2 rounded-md text-sm font-medium transition-all ${
+                      uploadMode === "file"
+                        ? "bg-gradient-to-r from-[#ffc247] to-[#00ffe5] text-gray-900"
+                        : "text-gray-600 hover:text-gray-900"
+                    }`}
+                  >
+                    <UploadCloud className="h-4 w-4" />
+                    Upload File
+                  </button>
+                  <button
+                    onClick={() => setUploadMode("youtube")}
+                    className={`flex items-center gap-2 px-4 py-2 rounded-md text-sm font-medium transition-all ${
+                      uploadMode === "youtube"
+                        ? "bg-gradient-to-r from-[#ffc247] to-[#00ffe5] text-gray-900"
+                        : "text-gray-600 hover:text-gray-900"
+                    }`}
+                  >
+                    <Youtube className="h-4 w-4" />
+                    YouTube URL
+                  </button>
+                </div>
+              </div>
+
+              {/* File Upload Mode */}
+              {uploadMode === "file" && (
+                <>
               <Dropzone
                 onDrop={handleDrop}
                 accept={{ "video/mp4": [".mp4"] }}
@@ -175,7 +256,7 @@ export function DashboardClient({
                 disabled={uploading}
                 maxFiles={1}
               >
-                {(dropzone: DropzoneState) => (
+                {(_dropzone: DropzoneState) => (
                   <>
                     <div className="flex flex-col items-center justify-center space-y-4 rounded-xl border-2 border-dashed border-[#ffc247]/40 bg-gradient-to-br from-[#ffc247]/5 to-[#00ffe5]/5 p-10 text-center transition-colors hover:border-[#ffc247]/60 hover:bg-gradient-to-br hover:from-[#ffc247]/10 hover:to-[#00ffe5]/10">
                       <div className="rounded-full bg-gradient-to-br from-[#ffc247]/20 to-[#00ffe5]/20 p-4">
@@ -225,6 +306,47 @@ export function DashboardClient({
                   )}
                 </Button>
               </div>
+                </>
+              )}
+
+              {/* YouTube URL Mode */}
+              {uploadMode === "youtube" && (
+                <div className="space-y-4">
+                  <div className="flex flex-col items-center justify-center space-y-4 rounded-xl border-2 border-dashed border-red-400/40 bg-gradient-to-br from-red-500/5 to-red-400/5 p-10 text-center">
+                    <div className="rounded-full bg-red-500/20 p-4">
+                      <Youtube className="h-10 w-10 text-red-500" />
+                    </div>
+                    <p className="font-medium text-gray-900">Paste a YouTube URL</p>
+                    <p className="text-gray-500 text-sm">
+                      Supports youtube.com, youtu.be, and YouTube Shorts (max 60 min)
+                    </p>
+                    <div className="w-full max-w-md space-y-3">
+                      <Input
+                        type="url"
+                        placeholder="https://youtube.com/watch?v=..."
+                        value={youtubeUrl}
+                        onChange={(e) => setYoutubeUrl(e.target.value)}
+                        disabled={processingYoutube}
+                        className="text-center"
+                      />
+                      <Button
+                        onClick={handleYoutubeSubmit}
+                        disabled={!youtubeUrl.trim() || processingYoutube}
+                        className="w-full bg-gradient-to-r from-[#ffc247] to-[#00ffe5] text-gray-900 hover:opacity-90 border-0 font-semibold disabled:opacity-50"
+                      >
+                        {processingYoutube ? (
+                          <>
+                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                            Processing...
+                          </>
+                        ) : (
+                          "Generate Clips from YouTube"
+                        )}
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              )}
 
               {uploadedFiles.length > 0 && (
                 <div className="pt-6">

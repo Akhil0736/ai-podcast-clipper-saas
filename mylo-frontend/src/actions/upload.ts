@@ -36,12 +36,12 @@ export async function generateUploadSignature(fileInfo: {
   const publicId = `${uniqueId}/original`;
   
   // Generate signature for secure upload
+  // Note: resource_type is NOT included in signature - it's passed in the URL path
   const signature = cloudinary.utils.api_sign_request(
     {
       timestamp: timestamp,
       folder: folder,
       public_id: publicId,
-      resource_type: "video",
     },
     env.CLOUDINARY_API_SECRET
   );
@@ -106,3 +106,87 @@ export async function getCloudinaryDownloadUrl(publicId: string) {
     flags: "attachment"
   });
 }
+
+
+export async function processYoutubeUrl(youtubeUrl: string): Promise<{
+  success: boolean;
+  uploadedFileId?: string;
+  error?: string;
+}> {
+  const session = await auth();
+  if (!session) throw new Error("Unauthorized");
+
+  // Extract video title from URL for display name
+  const videoId = extractYoutubeVideoId(youtubeUrl);
+  const displayName = `YouTube Video (${videoId ?? 'unknown'})`;
+
+  // Create database record
+  const uploadedFileDbRecord = await db.uploadedFile.create({
+    data: {
+      userId: session.user.id,
+      s3Key: `youtube/${videoId ?? uuidv4()}`,
+      displayName: displayName,
+      uploaded: true, // Mark as uploaded since we'll process directly
+      status: "queued",
+    },
+    select: {
+      id: true,
+    },
+  });
+
+  // Call Modal backend with YouTube URL
+  try {
+    const response = await fetch(env.PROCESS_VIDEO_ENDPOINT, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${env.PROCESS_VIDEO_ENDPOINT_AUTH}`,
+      },
+      body: JSON.stringify({
+        youtube_url: youtubeUrl,
+      }),
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(`Backend error: ${errorText}`);
+    }
+
+    // Update status to processing
+    await db.uploadedFile.update({
+      where: { id: uploadedFileDbRecord.id },
+      data: { status: "processing" },
+    });
+
+    return {
+      success: true,
+      uploadedFileId: uploadedFileDbRecord.id,
+    };
+  } catch (error) {
+    // Update status to failed
+    await db.uploadedFile.update({
+      where: { id: uploadedFileDbRecord.id },
+      data: { status: "failed" },
+    });
+
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : "Unknown error",
+    };
+  }
+}
+
+function extractYoutubeVideoId(url: string): string | null {
+  const patterns = [
+    /(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/shorts\/)([^&\n?#]+)/,
+  ];
+  
+  for (const pattern of patterns) {
+    const match = url.match(pattern);
+    if (match?.[1]) {
+      return match[1];
+    }
+  }
+  return null;
+}
+

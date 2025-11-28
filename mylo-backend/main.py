@@ -16,7 +16,8 @@ import requests
 
 
 class ProcessVideoRequest(BaseModel):
-    cloudinary_public_id: str
+    cloudinary_public_id: str | None = None
+    youtube_url: str | None = None
 
 
 image = (modal.Image.from_registry(
@@ -412,38 +413,77 @@ class MyloVideoClipper:
         print(f"Identified moments response: ${response.text}")
         return response.text
 
+    def download_youtube_video(self, youtube_url: str, output_path: str) -> dict:
+        """Download video from YouTube using yt-dlp"""
+        import yt_dlp
+        
+        ydl_opts = {
+            'format': 'best[ext=mp4]/best',
+            'outtmpl': output_path,
+            'max_filesize': 500 * 1024 * 1024,  # 500MB max
+            'quiet': False,
+            'no_warnings': False,
+        }
+        
+        with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+            info = ydl.extract_info(youtube_url, download=True)
+            return {
+                'title': info.get('title', 'Unknown'),
+                'duration': info.get('duration', 0),
+                'id': info.get('id', 'unknown')
+            }
+
     @modal.fastapi_endpoint(method="POST")
     def process_video(self, request: ProcessVideoRequest, token: HTTPAuthorizationCredentials = Depends(auth_scheme)):
         import cloudinary
         
-        s3_key = request.s3_key
-
         if token.credentials != os.environ["AUTH_TOKEN"]:
             raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,
                                 detail="Incorrect bearer token", headers={"WWW-Authenticate": "Bearer"})
 
+        # Validate request - need either cloudinary_public_id or youtube_url
+        if not request.cloudinary_public_id and not request.youtube_url:
+            raise HTTPException(status_code=400, detail="Either cloudinary_public_id or youtube_url is required")
+
         run_id = str(uuid.uuid4())
         base_dir = pathlib.Path("/tmp") / run_id
         base_dir.mkdir(parents=True, exist_ok=True)
-
-        # Download video file from Cloudinary
         video_path = base_dir / "input.mp4"
-        try:
-            # Get the video URL from Cloudinary
-            video_url = cloudinary.CloudinaryVideo(s3_key).build_url()
-            
-            # Download the video
-            response = requests.get(video_url, stream=True)
-            response.raise_for_status()
-            
-            with open(video_path, 'wb') as f:
-                for chunk in response.iter_content(chunk_size=8192):
-                    f.write(chunk)
-            
-            print(f"Downloaded video from Cloudinary: {s3_key}")
-        except Exception as e:
-            print(f"Error downloading from Cloudinary: {e}")
-            raise
+        
+        # Determine s3_key for output naming
+        if request.youtube_url:
+            s3_key = f"youtube/{run_id}"
+        else:
+            s3_key = request.cloudinary_public_id
+
+        # Download video from YouTube or Cloudinary
+        if request.youtube_url:
+            print(f"Downloading from YouTube: {request.youtube_url}")
+            try:
+                video_info = self.download_youtube_video(request.youtube_url, str(video_path))
+                print(f"Downloaded YouTube video: {video_info['title']} ({video_info['duration']}s)")
+                
+                # Check duration (max 60 minutes)
+                if video_info['duration'] > 3600:
+                    raise HTTPException(status_code=400, detail="Video exceeds maximum duration of 60 minutes")
+            except Exception as e:
+                print(f"Error downloading from YouTube: {e}")
+                raise HTTPException(status_code=400, detail=f"Failed to download YouTube video: {str(e)}")
+        else:
+            # Download from Cloudinary
+            try:
+                video_url = cloudinary.CloudinaryVideo(s3_key).build_url()
+                response = requests.get(video_url, stream=True)
+                response.raise_for_status()
+                
+                with open(video_path, 'wb') as f:
+                    for chunk in response.iter_content(chunk_size=8192):
+                        f.write(chunk)
+                
+                print(f"Downloaded video from Cloudinary: {s3_key}")
+            except Exception as e:
+                print(f"Error downloading from Cloudinary: {e}")
+                raise
 
         # 1. Transcription
         transcript_segments_json = self.transcribe_video(base_dir, video_path)
