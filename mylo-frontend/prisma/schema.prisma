@@ -92,6 +92,19 @@ model Clip {
     id String @id @default(cuid())
     s3Key String
 
+    // AI-generated content
+    titles String? // JSON array of 3 title options
+    caption String? // AI-generated caption
+    hashtags String? // JSON array of hashtags
+    transcript String? // Clip transcript text
+    transcriptSegments String? // JSON array of word segments with timestamps [{word, start, end}]
+    thumbnailUrl String? // AI-generated thumbnail URL
+    
+    // Original clip timing (for text-based editing)
+    originalStart Float? // Original start time in source video
+    originalEnd Float? // Original end time in source video
+    sourceVideoKey String? // Reference to source video for re-rendering
+
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
 

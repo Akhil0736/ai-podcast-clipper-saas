@@ -1,21 +1,40 @@
-tqdm
-torch
-opencv-python
-ffmpegcv
-numpy
-python_speech_features
+# Core ML dependencies
+torch==2.3.1
+torchaudio==2.3.1
+torchvision==0.18.1
+
+# Audio/Video processing
+opencv-python-headless>=4.8.0,<4.10.0
+ffmpegcv>=0.3.10
+av==11.0.0
+
+# Whisper and transcription
+faster-whisper
+whisperx==3.2.0
+pyannote-audio==3.1.1
+
+# ML utilities
+numpy<2.0
 scipy
-scenedetect
 scikit-learn
-gdown
-torchvision
-pandas
 transformers
 accelerate
 datasets
-google-genai
+
+# Video analysis
+python_speech_features
+scenedetect[opencv]
+
+# Utilities
+tqdm
+pandas
+gdown
 pysubs2
-cloudinary
-fastapi[standard]
-whisperx
 yt-dlp
+
+# Cloud services
+cloudinary
+google-genai
+
+# Web framework
+fastapi[standard]

@@ -13,7 +13,90 @@ import {
   CardTitle,
 } from "./ui/card";
 import { Input } from "./ui/input";
-import { Loader2, UploadCloud, Youtube } from "lucide-react";
+import { Loader2, UploadCloud, Sparkles, Wand2, Film, Scissors } from "lucide-react";
+import { useEffect } from "react";
+
+// Processing steps for animation
+const PROCESSING_STEPS = [
+  { icon: Film, label: "Analyzing video content...", duration: 3000 },
+  { icon: Wand2, label: "AI detecting key moments...", duration: 4000 },
+  { icon: Scissors, label: "Generating viral clips...", duration: 3000 },
+  { icon: Sparkles, label: "Polishing your clips...", duration: 2000 },
+];
+
+// Processing animation component
+function ProcessingAnimation({ filename }: { filename: string }) {
+  const [currentStep, setCurrentStep] = useState(0);
+  
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentStep((prev) => (prev + 1) % PROCESSING_STEPS.length);
+    }, 3000);
+    return () => clearInterval(interval);
+  }, []);
+
+  const CurrentIcon = PROCESSING_STEPS[currentStep]?.icon ?? Film;
+  const currentLabel = PROCESSING_STEPS[currentStep]?.label ?? "Processing...";
+
+  return (
+    <div className="relative overflow-hidden rounded-xl border border-[#ffc247]/30 bg-gradient-to-br from-[#ffc247]/5 via-white to-[#00ffe5]/5 p-6">
+      {/* Animated background shimmer */}
+      <div className="absolute inset-0 -translate-x-full animate-[shimmer_2s_infinite] bg-gradient-to-r from-transparent via-[#ffc247]/10 to-transparent" />
+      
+      <div className="relative flex items-center gap-4">
+        {/* Animated icon */}
+        <div className="relative">
+          <div className="absolute inset-0 animate-ping rounded-full bg-gradient-to-r from-[#ffc247] to-[#00ffe5] opacity-20" />
+          <div className="relative rounded-full bg-gradient-to-r from-[#ffc247] to-[#00ffe5] p-3">
+            <CurrentIcon className="h-6 w-6 text-gray-900 animate-pulse" />
+          </div>
+        </div>
+        
+        <div className="flex-1 min-w-0">
+          <p className="font-medium text-gray-900 truncate">{filename}</p>
+          <p className="text-sm text-gray-600 animate-pulse">{currentLabel}</p>
+        </div>
+
+        {/* Progress dots */}
+        <div className="flex gap-1.5">
+          {PROCESSING_STEPS.map((_, idx) => (
+            <div
+              key={idx}
+              className={`h-2 w-2 rounded-full transition-all duration-300 ${
+                idx === currentStep
+                  ? "bg-gradient-to-r from-[#ffc247] to-[#00ffe5] scale-125"
+                  : idx < currentStep
+                  ? "bg-[#00ffe5]"
+                  : "bg-gray-200"
+              }`}
+            />
+          ))}
+        </div>
+      </div>
+
+      {/* Progress bar */}
+      <div className="mt-4 h-1.5 w-full overflow-hidden rounded-full bg-gray-100">
+        <div 
+          className="h-full bg-gradient-to-r from-[#ffc247] to-[#00ffe5] transition-all duration-1000 ease-out animate-[progress_12s_linear_infinite]"
+          style={{ width: `${((currentStep + 1) / PROCESSING_STEPS.length) * 100}%` }}
+        />
+      </div>
+      
+      <p className="mt-2 text-xs text-gray-500 text-center">
+        This usually takes 2-5 minutes depending on video length
+      </p>
+    </div>
+  );
+}
+
+// YouTube icon component (avoiding deprecated lucide Youtube)
+function YoutubeIcon({ className }: { className?: string }) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="currentColor">
+      <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
+    </svg>
+  );
+}
 import { useState } from "react";
 import { generateUploadSignature, markFileAsUploaded, processYoutubeUrl } from "~/actions/upload";
 import { toast } from "sonner";
@@ -38,6 +121,15 @@ function isValidYoutubeUrl(url: string): boolean {
     /^(https?:\/\/)?(www\.)?youtube\.com\/shorts\/[\w-]+/,
   ];
   return patterns.some(pattern => pattern.test(url));
+}
+
+// Format date consistently to avoid hydration mismatch
+function formatDate(date: Date): string {
+  const d = new Date(date);
+  const month = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  const year = d.getFullYear();
+  return `${month}/${day}/${year}`;
 }
 
 export function DashboardClient({
@@ -162,7 +254,7 @@ export function DashboardClient({
           "Your video has been scheduled for processing. Check the status below.",
         duration: 5000,
       });
-    } catch (_error) {
+    } catch {
       toast.error("Upload failed", {
         description:
           "There was a problem uploading your video. Please try again.",
@@ -240,7 +332,7 @@ export function DashboardClient({
                         : "text-gray-600 hover:text-gray-900"
                     }`}
                   >
-                    <Youtube className="h-4 w-4" />
+                    <YoutubeIcon className="h-4 w-4" />
                     YouTube URL
                   </button>
                 </div>
@@ -312,9 +404,9 @@ export function DashboardClient({
               {/* YouTube URL Mode */}
               {uploadMode === "youtube" && (
                 <div className="space-y-4">
-                  <div className="flex flex-col items-center justify-center space-y-4 rounded-xl border-2 border-dashed border-red-400/40 bg-gradient-to-br from-red-500/5 to-red-400/5 p-10 text-center">
-                    <div className="rounded-full bg-red-500/20 p-4">
-                      <Youtube className="h-10 w-10 text-red-500" />
+                  <div className="flex flex-col items-center justify-center space-y-4 rounded-xl border-2 border-dashed border-[#ffc247]/40 bg-gradient-to-br from-[#ffc247]/5 to-[#00ffe5]/5 p-10 text-center transition-colors hover:border-[#ffc247]/60 hover:bg-gradient-to-br hover:from-[#ffc247]/10 hover:to-[#00ffe5]/10">
+                    <div className="rounded-full bg-gradient-to-br from-[#ffc247]/20 to-[#00ffe5]/20 p-4">
+                      <YoutubeIcon className="h-10 w-10 text-[#ff0000]" />
                     </div>
                     <p className="font-medium text-gray-900">Paste a YouTube URL</p>
                     <p className="text-gray-500 text-sm">
@@ -349,9 +441,14 @@ export function DashboardClient({
               )}
 
               {uploadedFiles.length > 0 && (
-                <div className="pt-6">
-                  <div className="mb-2 flex items-center justify-between">
-                    <h3 className="text-md mb-2 font-medium">Queue status</h3>
+                <div className="pt-6 space-y-4">
+                  {/* Show processing animation for items being processed */}
+                  {uploadedFiles.filter(f => f.status === "processing" || f.status === "queued").map((item) => (
+                    <ProcessingAnimation key={item.id} filename={item.filename} />
+                  ))}
+                  
+                  <div className="flex items-center justify-between">
+                    <h3 className="text-md font-medium">Queue status</h3>
                     <Button
                       variant="outline"
                       size="sm"
@@ -381,7 +478,7 @@ export function DashboardClient({
                               {item.filename}
                             </TableCell>
                             <TableCell className="text-muted-foreground text-sm">
-                              {new Date(item.createdAt).toLocaleDateString()}
+                              {formatDate(item.createdAt)}
                             </TableCell>
                             <TableCell>
                               {item.status === "queued" && (

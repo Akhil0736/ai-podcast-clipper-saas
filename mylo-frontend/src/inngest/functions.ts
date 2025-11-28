@@ -66,9 +66,15 @@ export const processVideo = inngest.createFunction(
           });
         });
 
-        await step.fetch(env.PROCESS_VIDEO_ENDPOINT, {
+        // Call backend to process video - now returns clip metadata
+        const response = await step.fetch(env.PROCESS_VIDEO_ENDPOINT, {
           method: "POST",
-          body: JSON.stringify({ s3_key: s3Key }),
+          body: JSON.stringify({ 
+            cloudinary_public_id: s3Key,
+            remove_silences: true,
+            remove_filler_words: true,
+            transition_style: "fade"
+          }),
           headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${env.PROCESS_VIDEO_ENDPOINT_AUTH}`,
@@ -78,7 +84,50 @@ export const processVideo = inngest.createFunction(
         const { clipsFound } = await step.run(
           "create-clips-in-db",
           async () => {
-            // List all videos in the mylo-videos folder with the prefix
+            // Try to parse response for clip metadata
+            let clipMetadata: Array<{
+              cloudinary_public_id?: string;
+              titles?: string[];
+              caption?: string;
+              hashtags?: string[];
+              transcript?: string;
+              transcript_segments?: Array<{word: string; start: number; end: number}>;
+              thumbnail_url?: string;
+              original_start?: number;
+              original_end?: number;
+              source_video_key?: string;
+            }> = [];
+            
+            try {
+              const responseData = await response.json() as { clips?: typeof clipMetadata };
+              clipMetadata = responseData.clips ?? [];
+            } catch {
+              // If response parsing fails, fall back to listing Cloudinary videos
+              console.log("Could not parse response, falling back to Cloudinary listing");
+            }
+
+            // If we have clip metadata from the response, use it
+            if (clipMetadata.length > 0) {
+              await db.clip.createMany({
+                data: clipMetadata.map((clip) => ({
+                  s3Key: clip.cloudinary_public_id ?? "",
+                  titles: clip.titles ? JSON.stringify(clip.titles) : null,
+                  caption: clip.caption ?? null,
+                  hashtags: clip.hashtags ? JSON.stringify(clip.hashtags) : null,
+                  transcript: clip.transcript ?? null,
+                  transcriptSegments: clip.transcript_segments ? JSON.stringify(clip.transcript_segments) : null,
+                  thumbnailUrl: clip.thumbnail_url ?? null,
+                  originalStart: clip.original_start ?? null,
+                  originalEnd: clip.original_end ?? null,
+                  sourceVideoKey: clip.source_video_key ?? null,
+                  uploadedFileId,
+                  userId,
+                })),
+              });
+              return { clipsFound: clipMetadata.length };
+            }
+
+            // Fallback: List all videos in the mylo-videos folder with the prefix
             const folderPrefix = s3Key.split("/")[0]!;
             
             const allPublicIds = await listCloudinaryVideosByPrefix(folderPrefix);
@@ -90,7 +139,7 @@ export const processVideo = inngest.createFunction(
             if (clipPublicIds.length > 0) {
               await db.clip.createMany({
                 data: clipPublicIds.map((clipPublicId) => ({
-                  s3Key: clipPublicId, // Store Cloudinary public_id (keeping field name for compatibility)
+                  s3Key: clipPublicId,
                   uploadedFileId,
                   userId,
                 })),
@@ -136,7 +185,7 @@ export const processVideo = inngest.createFunction(
           });
         });
       }
-    } catch (_error: unknown) {
+    } catch {
       await db.uploadedFile.update({
         where: {
           id: uploadedFileId,
