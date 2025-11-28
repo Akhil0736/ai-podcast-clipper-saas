@@ -1,0 +1,557 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme {
+  --font-sans:
+    var(--font-dm-sans), var(--font-jakarta), -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", 
+    ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", 
+    "Segoe UI Symbol", "Noto Color Emoji";
+  --font-subtext:
+    "SF Pro Rounded", "SF Pro Text", -apple-system, BlinkMacSystemFont, 
+    var(--font-dm-sans), ui-sans-serif, system-ui, sans-serif;
+}
+
+:root {
+  --background: oklch(0.98 0 0);
+  --foreground: oklch(0.24 0 0);
+  --card: oklch(0.99 0 0);
+  --card-foreground: oklch(0.24 0 0);
+  --popover: oklch(0.99 0 0);
+  --popover-foreground: oklch(0.24 0 0);
+  --primary: oklch(0.43 0.04 41.99);
+  --primary-foreground: oklch(1 0 0);
+  --secondary: oklch(0.92 0.07 74.37);
+  --secondary-foreground: oklch(0.35 0.07 40.83);
+  --muted: oklch(0.95 0 0);
+  --muted-foreground: oklch(0.5 0 0);
+  --accent: oklch(0.93 0 0);
+  --accent-foreground: oklch(0.24 0 0);
+  --destructive: oklch(0.63 0.19 33.34);
+  --destructive-foreground: oklch(1 0 0);
+  --border: oklch(0.88 0 0);
+  --input: oklch(0.88 0 0);
+  --ring: oklch(0.43 0.04 41.99);
+  --chart-1: oklch(0.43 0.04 41.99);
+  --chart-2: oklch(0.92 0.07 74.37);
+  --chart-3: oklch(0.93 0 0);
+  --chart-4: oklch(0.94 0.05 75.5);
+  --chart-5: oklch(0.43 0.04 41.67);
+  --sidebar: oklch(0.99 0 0);
+  --sidebar-foreground: oklch(0.26 0 0);
+  --sidebar-primary: oklch(0.33 0 0);
+  --sidebar-primary-foreground: oklch(0.99 0 0);
+  --sidebar-accent: oklch(0.98 0 0);
+  --sidebar-accent-foreground: oklch(0.33 0 0);
+  --sidebar-border: oklch(0.94 0 0);
+  --sidebar-ring: oklch(0.77 0 0);
+  --font-sans:
+    ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+    Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif,
+    "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+  --font-serif: ui-serif, Georgia, Cambria, "Times New Roman", Times, serif;
+  --font-mono:
+    ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono",
+    "Courier New", monospace;
+  --radius: 0.5rem;
+  --shadow-2xs: 0 1px 3px 0px hsl(0 0% 0% / 0.05);
+  --shadow-xs: 0 1px 3px 0px hsl(0 0% 0% / 0.05);
+  --shadow-sm:
+    0 1px 3px 0px hsl(0 0% 0% / 0.1), 0 1px 2px -1px hsl(0 0% 0% / 0.1);
+  --shadow: 0 1px 3px 0px hsl(0 0% 0% / 0.1), 0 1px 2px -1px hsl(0 0% 0% / 0.1);
+  --shadow-md:
+    0 1px 3px 0px hsl(0 0% 0% / 0.1), 0 2px 4px -1px hsl(0 0% 0% / 0.1);
+  --shadow-lg:
+    0 1px 3px 0px hsl(0 0% 0% / 0.1), 0 4px 6px -1px hsl(0 0% 0% / 0.1);
+  --shadow-xl:
+    0 1px 3px 0px hsl(0 0% 0% / 0.1), 0 8px 10px -1px hsl(0 0% 0% / 0.1);
+  --shadow-2xl: 0 1px 3px 0px hsl(0 0% 0% / 0.25);
+}
+
+.dark {
+  --background: oklch(0.18 0 0);
+  --foreground: oklch(0.95 0 0);
+  --card: oklch(0.21 0 0);
+  --card-foreground: oklch(0.95 0 0);
+  --popover: oklch(0.21 0 0);
+  --popover-foreground: oklch(0.95 0 0);
+  --primary: oklch(0.92 0.05 66.17);
+  --primary-foreground: oklch(0.2 0.02 200.2);
+  --secondary: oklch(0.32 0.02 63.7);
+  --secondary-foreground: oklch(0.92 0.05 66.17);
+  --muted: oklch(0.25 0 0);
+  --muted-foreground: oklch(0.77 0 0);
+  --accent: oklch(0.29 0 0);
+  --accent-foreground: oklch(0.95 0 0);
+  --destructive: oklch(0.63 0.19 33.34);
+  --destructive-foreground: oklch(1 0 0);
+  --border: oklch(0.24 0.01 91.75);
+  --input: oklch(0.4 0 0);
+  --ring: oklch(0.92 0.05 66.17);
+  --chart-1: oklch(0.92 0.05 66.17);
+  --chart-2: oklch(0.32 0.02 63.7);
+  --chart-3: oklch(0.29 0 0);
+  --chart-4: oklch(0.35 0.02 67);
+  --chart-5: oklch(0.92 0.05 67.09);
+  --sidebar: oklch(0.21 0.01 285.89);
+  --sidebar-foreground: oklch(0.97 0 286.38);
+  --sidebar-primary: oklch(0.49 0.22 264.38);
+  --sidebar-primary-foreground: oklch(1 0 0);
+  --sidebar-accent: oklch(0.27 0.01 286.03);
+  --sidebar-accent-foreground: oklch(0.97 0 286.38);
+  --sidebar-border: oklch(0.27 0.01 286.03);
+  --sidebar-ring: oklch(0.87 0.01 286.29);
+  --font-sans:
+    ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+    Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif,
+    "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+  --font-serif: ui-serif, Georgia, Cambria, "Times New Roman", Times, serif;
+  --font-mono:
+    ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono",
+    "Courier New", monospace;
+  --radius: 0.5rem;
+  --shadow-2xs: 0 1px 3px 0px hsl(0 0% 0% / 0.05);
+  --shadow-xs: 0 1px 3px 0px hsl(0 0% 0% / 0.05);
+  --shadow-sm:
+    0 1px 3px 0px hsl(0 0% 0% / 0.1), 0 1px 2px -1px hsl(0 0% 0% / 0.1);
+  --shadow: 0 1px 3px 0px hsl(0 0% 0% / 0.1), 0 1px 2px -1px hsl(0 0% 0% / 0.1);
+  --shadow-md:
+    0 1px 3px 0px hsl(0 0% 0% / 0.1), 0 2px 4px -1px hsl(0 0% 0% / 0.1);
+  --shadow-lg:
+    0 1px 3px 0px hsl(0 0% 0% / 0.1), 0 4px 6px -1px hsl(0 0% 0% / 0.1);
+  --shadow-xl:
+    0 1px 3px 0px hsl(0 0% 0% / 0.1), 0 8px 10px -1px hsl(0 0% 0% / 0.1);
+  --shadow-2xl: 0 1px 3px 0px hsl(0 0% 0% / 0.25);
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+
+  --font-sans: var(--font-sans);
+  --font-mono: var(--font-mono);
+  --font-serif: var(--font-serif);
+  --font-subtext: var(--font-subtext);
+
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+
+  --shadow-2xs: var(--shadow-2xs);
+  --shadow-xs: var(--shadow-xs);
+  --shadow-sm: var(--shadow-sm);
+  --shadow: var(--shadow);
+  --shadow-md: var(--shadow-md);
+  --shadow-lg: var(--shadow-lg);
+  --shadow-xl: var(--shadow-xl);
+  --shadow-2xl: var(--shadow-2xl);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+}
+
+@layer utilities {
+  .font-lobster {
+    font-family: var(--font-lobster);
+  }
+  
+  .font-subtext {
+    font-family: "TikTok Sans", "SF Pro Rounded", "SF Pro Text", -apple-system, BlinkMacSystemFont, var(--font-dm-sans), ui-sans-serif, system-ui, sans-serif;
+  }
+  
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+/* Animated Text Color Gradient Styles */
+@keyframes gradient-foreground-1 {
+  from, 16.667%, to {
+    opacity: 1;
+  }
+  33.333%, 83.333% {
+    opacity: 0;
+  }
+}
+
+.animate-gradient-foreground-1 {
+  animation: gradient-foreground-1 8s infinite;
+}
+
+@keyframes gradient-foreground-2 {
+  from, to {
+    opacity: 0;
+  }
+  33.333%, 50% {
+    opacity: 1;
+  }
+  16.667%, 66.667% {
+    opacity: 0;
+  }
+}
+
+.animate-gradient-foreground-2 {
+  animation: gradient-foreground-2 8s infinite;
+}
+
+@keyframes gradient-foreground-3 {
+  from, 50%, to {
+    opacity: 0;
+  }
+  66.667%, 83.333% {
+    opacity: 1;
+  }
+}
+
+.animate-gradient-foreground-3 {
+  animation: gradient-foreground-3 8s infinite;
+}
+
+/* Gradient color stops using theme colors */
+.from-gradient-1-start {
+  --tw-gradient-from: #ffc247;
+  --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to, rgba(255, 194, 71, 0));
+}
+
+.to-gradient-1-end {
+  --tw-gradient-to: #00ffe5;
+}
+
+.from-gradient-2-start {
+  --tw-gradient-from: #00ffe5;
+  --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to, rgba(0, 255, 229, 0));
+}
+
+.to-gradient-2-end {
+  --tw-gradient-to: #ffc247;
+}
+
+.from-gradient-3-start {
+  --tw-gradient-from: #fffdd9;
+  --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to, rgba(255, 253, 217, 0));
+}
+
+.to-gradient-3-end {
+  --tw-gradient-to: #00ffe5;
+}
+
+@keyframes gradient-background-1 {
+  from, 16.667%, to {
+    opacity: 0;
+  }
+  25%, 91.667% {
+    opacity: 1;
+  }
+}
+
+.before\:animate-gradient-background-1::before {
+  content: "";
+  animation: gradient-background-1 8s infinite;
+}
+
+@keyframes gradient-background-2 {
+  from, to {
+    opacity: 1;
+  }
+  33.333%, 50% {
+    opacity: 0;
+  }
+  25%, 58.333% {
+    opacity: 1;
+  }
+}
+
+.before\:animate-gradient-background-2::before {
+  content: "";
+  animation: gradient-background-2 8s infinite;
+}
+
+@keyframes gradient-background-3 {
+  from, 58.333%, 91.667%, to {
+    opacity: 1;
+  }
+  66.667%, 83.333% {
+    opacity: 0;
+  }
+}
+
+.before\:animate-gradient-background-3::before {
+  content: "";
+  animation: gradient-background-3 8s infinite;
+}
+
+.before\:content-\[attr\(data-content\)\]::before {
+  content: attr(data-content);
+}
+
+/* Gradient Button Styles */
+@layer base {
+  @property --pos-x {
+    syntax: '<percentage>';
+    initial-value: 11.14%;
+    inherits: false;
+  }
+
+  @property --pos-y {
+    syntax: '<percentage>';
+    initial-value: 140%;
+    inherits: false;
+  }
+
+  @property --spread-x {
+    syntax: '<percentage>';
+    initial-value: 150%;
+    inherits: false;
+  }
+
+  @property --spread-y {
+    syntax: '<percentage>';
+    initial-value: 180.06%;
+    inherits: false;
+  }
+
+  @property --color-1 {
+    syntax: '<color>';
+    initial-value: #1a1a1a;
+    inherits: false;
+  }
+
+  @property --color-2 {
+    syntax: '<color>';
+    initial-value: #2d2d0a;
+    inherits: false;
+  }
+
+  @property --color-3 {
+    syntax: '<color>';
+    initial-value: #5c4a0f;
+    inherits: false;
+  }
+
+  @property --color-4 {
+    syntax: '<color>';
+    initial-value: #8b6914;
+    inherits: false;
+  }
+
+  @property --color-5 {
+    syntax: '<color>';
+    initial-value: #ffc247;
+    inherits: false;
+  }
+
+  @property --border-angle {
+    syntax: '<angle>';
+    initial-value: 20deg;
+    inherits: true;
+  }
+
+  @property --border-color-1 {
+    syntax: '<color>';
+    initial-value: hsla(42, 100%, 64%, 0.3);
+    inherits: true;
+  }
+
+  @property --border-color-2 {
+    syntax: '<color>';
+    initial-value: hsla(170, 100%, 50%, 0.6);
+    inherits: true;
+  }
+
+  @property --stop-1 {
+    syntax: '<percentage>';
+    initial-value: 37.35%;
+    inherits: false;
+  }
+
+  @property --stop-2 {
+    syntax: '<percentage>';
+    initial-value: 61.36%;
+    inherits: false;
+  }
+
+  @property --stop-3 {
+    syntax: '<percentage>';
+    initial-value: 78.42%;
+    inherits: false;
+  }
+
+  @property --stop-4 {
+    syntax: '<percentage>';
+    initial-value: 89.52%;
+    inherits: false;
+  }
+
+  @property --stop-5 {
+    syntax: '<percentage>';
+    initial-value: 100%;
+    inherits: false;
+  }
+}
+
+/* Shine Border Animation */
+@property --shine-angle {
+  syntax: '<angle>';
+  initial-value: 0deg;
+  inherits: false;
+}
+
+@keyframes shine-rotate {
+  0% {
+    --shine-angle: 0deg;
+  }
+  100% {
+    --shine-angle: 360deg;
+  }
+}
+
+.shine-border-container {
+  position: relative;
+}
+
+.shine-border-animation {
+  position: absolute;
+  inset: 0;
+  background: conic-gradient(from var(--shine-angle), transparent 0%, #ffc247, #00ffe5, transparent 30%);
+}
+
+@layer components {
+  .gradient-button {
+    @apply relative appearance-none cursor-pointer;
+    background: radial-gradient(
+      var(--spread-x) var(--spread-y) at var(--pos-x) var(--pos-y),
+      var(--color-1) var(--stop-1),
+      var(--color-2) var(--stop-2),
+      var(--color-3) var(--stop-3),
+      var(--color-4) var(--stop-4),
+      var(--color-5) var(--stop-5)
+    );
+    transition:
+      --pos-x 0.5s,
+      --pos-y 0.5s,
+      --spread-x 0.5s,
+      --spread-y 0.5s,
+      --color-1 0.5s,
+      --color-2 0.5s,
+      --color-3 0.5s,
+      --color-4 0.5s,
+      --color-5 0.5s,
+      --border-angle 0.5s,
+      --border-color-1 0.5s,
+      --border-color-2 0.5s,
+      --stop-1 0.5s,
+      --stop-2 0.5s,
+      --stop-3 0.5s,
+      --stop-4 0.5s,
+      --stop-5 0.5s;
+  }
+
+  .gradient-button::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    padding: 1px;
+    background: linear-gradient(
+      var(--border-angle),
+      var(--border-color-1),
+      var(--border-color-2)
+    );
+    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    mask-composite: exclude;
+    pointer-events: none;
+  }
+
+  .gradient-button:hover {
+    --pos-x: 0%;
+    --pos-y: 91.51%;
+    --spread-x: 120.24%;
+    --spread-y: 103.18%;
+    --color-1: #ffc247;
+    --color-2: #e5a830;
+    --color-3: #00c4b4;
+    --color-4: #008577;
+    --color-5: #1a1a1a;
+    --border-angle: 190deg;
+    --border-color-1: hsla(170, 100%, 50%, 0.3);
+    --border-color-2: hsla(42, 100%, 64%, 0.7);
+    --stop-1: 0%;
+    --stop-2: 15%;
+    --stop-3: 35%;
+    --stop-4: 65%;
+    --stop-5: 100%;
+  }
+
+  .gradient-button-variant {
+    --color-1: #0a1a1a;
+    --color-2: #0d3d3d;
+    --color-3: #00c4b4;
+    --color-4: #00ffe5;
+    --border-angle: 200deg;
+    --border-color-1: hsla(170, 100%, 50%, 0.6);
+    --border-color-2: hsla(42, 100%, 64%, 0.3);
+  }
+
+  .gradient-button-variant:hover {
+    --pos-x: 0%;
+    --pos-y: 95.51%;
+    --spread-x: 110.24%;
+    --spread-y: 110.2%;
+    --color-1: #00ffe5;
+    --color-2: #00c4b4;
+    --color-3: #ffc247;
+    --color-4: #8b6914;
+    --color-5: #1a1a1a;
+    --stop-1: 0%;
+    --stop-2: 15%;
+    --stop-3: 40%;
+    --stop-4: 70%;
+    --stop-5: 100%;
+    --border-angle: 210deg;
+    --border-color-1: hsla(42, 100%, 64%, 0.3);
+    --border-color-2: hsla(170, 100%, 50%, 0.7);
+  }
+}

@@ -26,23 +26,27 @@ pnpm-debug.log*
 
 *.mp4
 
-# Frontend (evo2-frontend - Next.js)
-ai-podcast-clipper-frontend/node_modules/
-ai-podcast-clipper-frontend/.next/
-ai-podcast-clipper-frontend/out/
-ai-podcast-clipper-frontend/.env*.local
-ai-podcast-clipper-frontend/*.tsbuildinfo
-ai-podcast-clipper-frontend/next-env.d.ts
+# Frontend (Next.js)
+mylo-frontend/node_modules/
+mylo-frontend/.next/
+mylo-frontend/out/
+mylo-frontend/.env
+mylo-frontend/.env.local
+mylo-frontend/.env*.local
+mylo-frontend/*.tsbuildinfo
+mylo-frontend/next-env.d.ts
+mylo-frontend/prisma/dev.db
+mylo-frontend/prisma/dev.db-journal
 
-# Backend (evo2-backend - Python/Modal)
-ai-podcast-clipper-backend/__pycache__/
-ai-podcast-clipper-backend/*.pyc
-ai-podcast-clipper-backend/*.pyo
-ai-podcast-clipper-backend/*.pyd
-ai-podcast-clipper-backend/.venv/
-ai-podcast-clipper-backend/venv/
-ai-podcast-clipper-backend/env/
-ai-podcast-clipper-backend/*.env
-ai-podcast-clipper-backend/.env
-ai-podcast-clipper-backend/.modal*
-ai-podcast-clipper-backend/brca1_analysis_plot.png
+# Backend (Python/Modal)
+mylo-backend/__pycache__/
+mylo-backend/*.pyc
+mylo-backend/*.pyo
+mylo-backend/*.pyd
+mylo-backend/.venv/
+mylo-backend/venv/
+mylo-backend/env/
+mylo-backend/*.env
+mylo-backend/.env
+mylo-backend/.modal*
+mylo-backend/brca1_analysis_plot.png

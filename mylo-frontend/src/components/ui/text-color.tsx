@@ -1,0 +1,47 @@
+"use client";
+
+import React from "react";
+import { Plus } from "lucide-react";
+
+export function TextColor() {
+  return (
+    <div>
+      <div className="mb-10 mt-4 md:mt-6">
+        <div className="px-2">
+          <div className="relative p-8 w-full h-full">
+            <h1 className="tracking-tighter flex select-none px-3 py-2 flex-col text-center text-6xl font-extrabold leading-none sm:text-7xl md:text-8xl md:flex-col lg:flex-row lg:justify-center">
+              <Plus className="absolute -left-4 -top-4 h-8 w-8 text-[#ffc247]" />
+              <Plus className="absolute -bottom-4 -left-4 h-8 w-8 text-[#ffc247]" />
+              <Plus className="absolute -right-4 -top-4 h-8 w-8 text-[#00ffe5]" />
+              <Plus className="absolute -bottom-4 -right-4 h-8 w-8 text-[#00ffe5]" />
+              <span
+                data-content="Upload"
+                className="before:animate-gradient-background-1 relative before:absolute before:bottom-4 before:left-0 before:top-0 before:z-0 before:w-full before:px-2 before:content-[attr(data-content)] sm:before:top-0"
+              >
+                <span className="from-gradient-1-start to-gradient-1-end animate-gradient-foreground-1 bg-gradient-to-r bg-clip-text px-2 text-transparent sm:px-5">
+                  Upload
+                </span>
+              </span>
+              <span
+                data-content="Process"
+                className="before:animate-gradient-background-2 relative before:absolute before:bottom-0 before:left-0 before:top-0 before:z-0 before:w-full before:px-2 before:content-[attr(data-content)] sm:before:top-0"
+              >
+                <span className="from-gradient-2-start to-gradient-2-end animate-gradient-foreground-2 bg-gradient-to-r bg-clip-text px-2 text-transparent sm:px-5">
+                  Process
+                </span>
+              </span>
+              <span
+                data-content="Viral"
+                className="before:animate-gradient-background-3 relative before:absolute before:bottom-1 before:left-0 before:top-0 before:z-0 before:w-full before:px-2 before:content-[attr(data-content)] sm:before:top-0"
+              >
+                <span className="from-gradient-3-start to-gradient-3-end animate-gradient-foreground-3 bg-gradient-to-r bg-clip-text px-2 text-transparent sm:px-5">
+                  Viral
+                </span>
+              </span>
+            </h1>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}

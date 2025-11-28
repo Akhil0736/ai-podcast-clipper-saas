@@ -1,4 +1,4 @@
-# AI Podcast Clipper
+# Mylo - AI Video Clipper
 
 ![alt text](thumbnail.png)
 
@@ -8,11 +8,11 @@
 
 ## Overview
 
-Hi 🤙 In this project, you'll build a SaaS application that converts full podcasts into viral short-form clips ready for YouTube Shorts or TikTok. The tool uses different AI models to transcribe the video, automatically detect the most engaging moments in podcasts and create clips cropped to the active speaker's face. You'll learn how to build a complete production-ready SaaS with user authentication, a credit-based payment system using Stripe, and background processing queues to handle user load. All services used in this project are free, so you won't have to pay anything to follow along. We'll use technologies such as Next.js 15, React, Typescript, Tailwind CSS, ShadCN, Auth.js, Python, FastAPI, Stripe, Modal, Inngest, S3 on AWS, and more
+Hi 🤙 Mylo is a SaaS application that converts raw video footage into viral short-form clips ready for YouTube Shorts or TikTok. The tool uses different AI models to transcribe the video, automatically detect the most engaging moments and create clips cropped to the active speaker's face. This is a complete production-ready SaaS with user authentication, a credit-based payment system using Stripe, and background processing queues to handle user load. All services used in this project are free, so you won't have to pay anything to follow along. Technologies include Next.js 15, React, Typescript, Tailwind CSS, ShadCN, Auth.js, Python, FastAPI, Stripe, Modal, Inngest, S3 on AWS, and more.
 
 Features:
 
-- 🎬 Auto-detection of viral moments in podcasts (stories, questions, etc.)
+- 🎬 Auto-detection of viral moments in videos (stories, questions, etc.)
 - 🔊 Automatically added subtitles on clips
 - 📝 Transcription with m-bain/whisperX
 - 🎯 Active speaker detection for video cropping with Junhua-Liao/LR-ASD
@@ -24,10 +24,10 @@ Features:
 - 💰 Stripe integration for credit pack purchases
 - 👤 User authentication system
 - 📱 Responsive Next.js web interface
-- 🎛️ Dashboard to upload podcasts and see clips
+- 🎛️ Dashboard to upload videos and see clips
 - ⏱️ Inngest for handling long-running processes
 - ⚡ Serverless GPU processing with Modal
-- 🌐 FastAPI endpoint for podcast processing
+- 🌐 FastAPI endpoint for video processing
 - 🎨 Modern UI with Tailwind CSS & Shadcn UI
 
 ## Setup
@@ -37,7 +37,7 @@ Follow these steps to install and set up the project.
 ### Clone the Repository
 
 ```bash
-git clone --recurse-submodules https://github.com/Andreaswt/ai-podcast-clipper-saas.git
+git clone --recurse-submodules https://github.com/yourusername/mylo.git
 ```
 
 ### Install Python
@@ -52,7 +52,7 @@ Create a virtual environment with **Python 3.12**.
 Navigate to backend folder:
 
 ```bash
-cd ai-podcast-clipper-backend
+cd mylo-backend
 ```
 
 Install dependencies:
@@ -90,7 +90,7 @@ modal deploy main.py
 Install dependencies:
 
 ```bash
-cd ai-podcast-clipper-frontend
+cd mylo-frontend
 npm i
 ```
 
@@ -105,7 +105,7 @@ npm run dev
 Run the local queue development server with Inngest:
 
 ```bash
-cd ai-podcast-clipper-frontend
+cd mylo-frontend
 npm run inngest-dev
 ```
 
